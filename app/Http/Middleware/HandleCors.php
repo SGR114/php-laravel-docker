@@ -9,9 +9,22 @@ class HandleCors
 {
     public function handle(Request $request, Closure $next)
     {
-        return $next($request)
-            ->header('Access-Control-Allow-Origin', '*')  // 任意のオリジンを設定
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
+        // 任意のオリジンやヘッダーを設定
+        $allowedOrigins = ['https://dkq73z-5173.csb.app'];  // ここにCodeSandboxのURLを設定
+        $allowedMethods = 'GET, POST, PUT, DELETE, OPTIONS';  // 許可するメソッド
+        $allowedHeaders = 'Content-Type, X-Requested-With';  // 許可するヘッダー
+
+        // CORSヘッダーを追加
+        $response = $next($request);
+        $response->headers->set('Access-Control-Allow-Origin', implode(', ', $allowedOrigins));
+        $response->headers->set('Access-Control-Allow-Methods', $allowedMethods);
+        $response->headers->set('Access-Control-Allow-Headers', $allowedHeaders);
+
+        // 必要に応じてOPTIONSリクエストに対応する
+        if ($request->getMethod() == "OPTIONS") {
+            return $response;
+        }
+
+        return $response;
     }
 }
